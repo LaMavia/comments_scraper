@@ -7,9 +7,10 @@ import { inBrowser } from "./inbrowser/main"
 @Injectable()
 export class ReaderService {
 
-  async getComments(url: string): Promise<Comment[]> {
+  async getComments(url: string, waitForComments: number, waitAfterScroll: number): Promise<Comment[]> {
     const browser = await puppeteer.launch({
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -18,11 +19,13 @@ export class ReaderService {
     });
 
     await page.goto(url, { waitUntil: 'networkidle2' }).catch(console.error);
-    const comments: Comment[] = await page.evaluate(inBrowser);
-    console.dir(comments, { colors: true });
+    const comments: Comment[] = await page.evaluate(inBrowser, waitForComments, waitAfterScroll).catch(browser.close)
     await browser.close();
-
-    return comments;
+    if(comments.length) {
+      return comments
+    } else {
+      return []
+    }
   }
 }
 /*.map(
