@@ -4,7 +4,7 @@ export function inBrowser(waitForComments = 850, waitAfterScroll = 2500) {
     // window.scrollBy(0, window.innerHeight);
     document.getElementById('meta').scrollIntoView();
 
-    return wait(1300).then(() => {
+    return wait(300).then(() => {
       // TODO Optimize that wait func.
       const commentsBox = document.querySelector(
         'div#contents.style-scope.ytd-item-section-renderer'
@@ -41,9 +41,9 @@ export function inBrowser(waitForComments = 850, waitAfterScroll = 2500) {
                 comments = comments.concat(
                   newComments.filter(
                     newComment =>
-                      !comments.some(
-                        oldComment => newComment.Content === oldComment.Content,
-                      ),
+                      !comments.some( // Is there any comment with the same content??
+                        oldComment => newComment.Content === oldComment.Content
+                      )
                   ),
                 );
               }
@@ -54,7 +54,9 @@ export function inBrowser(waitForComments = 850, waitAfterScroll = 2500) {
         window.scrollBy(0, window.innerHeight); // document.scrollingElement.scrollHeight * 0.5
         document.scrollingElement.dispatchEvent(new UIEvent('scroll'));
 
-        timer = setTimeout(() => resolve(comments), waitAfterScroll);
+        timer = setTimeout(() => {
+          comments ? resolve(comments) : clearTimeout(timer);
+        }, waitAfterScroll);
       }
 
       function retrieveComments(box) {
