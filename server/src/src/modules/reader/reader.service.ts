@@ -13,7 +13,7 @@ export class ReaderService {
   ): Promise<Comment[]> {
     const browser = await puppeteer.launch({
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-      headless: false,
+      headless: true,
     });
     const page = await browser.newPage();
     await page.setViewport({
@@ -21,13 +21,20 @@ export class ReaderService {
       height: 1080,
     });
 
-    await page.goto(url, { waitUntil: 'networkidle2' }).catch(console.error);
+    await page.goto(url, { waitUntil: 'networkidle2', timeout: 6000000 }).catch(console.error);
+    // await page.waitForSelector("#meta")
+    // await page.waitForFunction("window.scrollBy(0, )")
+    await page.evaluate("window.scrollBy(0, window.innerHeight * 0.4)")
+    await page.waitForSelector('#header.style-scope.ytd-item-section-renderer')
     const comments: Comment[] = await page
       .evaluate(inBrowser, waitForComments, waitAfterScroll)
-      .catch(err => new Promise((_res, rej) => {
-        browser.close()
-        return rej(err)
-      }));
+      .catch(
+        err =>
+          new Promise((_res, rej) => {
+            browser.close();
+            return rej(err);
+          }),
+      );
     await browser.close();
     return comments || [];
 
