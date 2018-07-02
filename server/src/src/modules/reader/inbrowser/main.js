@@ -1,7 +1,6 @@
 export function inBrowser(waitForComments = 850, waitAfterScroll = 2500) {
   const wait = ms => new Promise(res => setTimeout(res, ms));
   return new Promise((resolve, reject) => {
-    // TODO Optimize that wait func.
     const commentsBox = document.querySelector(
       'div#contents.style-scope.ytd-item-section-renderer',
     );
@@ -19,39 +18,16 @@ export function inBrowser(waitForComments = 850, waitAfterScroll = 2500) {
     document.body.dispatchEvent(new UIEvent('scroll'));
     window.scrollBy(0, window.innerHeight * -0.3);
 
-    function ds() {
-      return (
-        document.scrollingElement.scrollHeight -
-        document.scrollingElement.scrollTop -
-        window.innerHeight
-      );
-    }
-
     function mutationCallback(mutationList) {
       clearTimeout(timer);
       let target
-      window.scrollBy(0, window.innerHeight); // document.scrollingElement.scrollHeight * 0.5
+      window.scrollBy(0, document.scrollingElement.scrollHeight * 0.5); // document.scrollingElement.scrollHeight * 0.5
       document.scrollingElement.dispatchEvent(new UIEvent('scroll'));
       for (const mut of mutationList) {
         if (mut.type === 'childList') {
           target = mut.target
-          // wait(waitForComments).then(() => {
-          //   const newComments = retrieveComments(mut.target).filter(Boolean);
-          //   if (newComments) {
-          //     comments = comments.concat(
-          //       newComments.filter(
-          //         newComment =>
-          //           !comments.some(
-          //             // Is there any comment with the same content??
-          //             oldComment => newComment.Content === oldComment.Content,
-          //           ),
-          //       ),
-          //     );
-          //   }
-          // });
         }
       }
-      // Scroll for more events to trigger
 
       timer = setTimeout((target) => {
         comments ? resolve(retrieveComments(target).filter(Boolean)) : clearTimeout(timer);

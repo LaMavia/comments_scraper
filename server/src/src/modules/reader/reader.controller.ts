@@ -13,8 +13,8 @@ export class ReaderController {
   @Post("/comments")
   async comments(@Req() req: Request) {
     const v   =  req.query["v"]
-    const wfc = +req.query["wfc"] || 800
-    const was = +req.query["was"] || 2500
+    const wfc = +req.query["wfc"] || 50
+    const was = +req.query["was"] || 1800
     const show = isUndefined(req.query["show"]) ? true : !!Number(req.query["show"])
 
     console.dir({v, wfc, was, show}, {colors: true})

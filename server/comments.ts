@@ -101,7 +101,7 @@ export class CommentsOptimizer {
     }
 
     const currLoss = this.loss(
-      res.lost || Number.MAX_SAFE_INTEGER,
+      res.lost || 1,
       res.length || 1,
     );
     if (this.prevLoss < currLoss || n >= this.maxIterations) {
@@ -117,7 +117,7 @@ export class CommentsOptimizer {
       console.clear()
       console.log(`
         Iteration: ${n}
-        Variable: ${toOpt}
+        Variable: ${this.variables[this.variableToTrain].prev}
         Loss: ${this.prevLoss = this.prevLoss}
         Lost: ${res.lost}
         Retrieved: ${res.length}
@@ -130,15 +130,16 @@ export class CommentsOptimizer {
 
 (async () => {
   const myOpttimizer = new CommentsOptimizer(
-    `FobDkhPpbsw`,
-    200,
-    8,
+    `RIFjbQMSGIs`,
+    10,
+    12,
     {
-      waitForComments: { prev: 740, curr: 740 },
-      waitAfterScroll: { prev: 2100, curr: 2100 },
+      waitForComments: { prev: 60, curr: 60 },
+      waitAfterScroll: { prev: 1150, curr: 1150 },
     },
-    'waitAfterScroll',
+    'waitForComments',
   );
 
+  console.clear()
   console.dir(await myOpttimizer.iteration(0), { colors: true });
 })();
